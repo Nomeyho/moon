@@ -10,10 +10,8 @@
   npm run build
 ```
 
-
-## TODO
-* On hover => day
-* On hover => name
-* On hover => yellow with D3
-* Remove unexisting days
-* 
+## Imropvement
+* Animation on hover
+  - highlight legend
+  - color moon
+  -display moon phase
