@@ -4,22 +4,21 @@ import { range, months } from './utils'
 import Moon from './Moon'
 
 const MARGIN = { left: 50, top: 50, right: 0, bottom: 0 }
+const YEAR = new Date().getFullYear()
 
 class App extends Component {
 
   constructor(props) {
     super(props)
-    const year = new Date().getFullYear()
     this.state = {
       size: 0,
       width: 0,
       height: 0,
-      year,
-      data: getData(year)
+      year: YEAR,
+      data: getData(YEAR)
     }
     this.container = React.createRef()
     this.onResize = this.onResize.bind(this)
-    this.renderMoons = this.renderMoons.bind(this)
     this.renderMoon = this.renderMoon.bind(this)
   }
 
@@ -47,36 +46,31 @@ class App extends Component {
     }
   }
 
-  renderMoons(month, i) {
-    return (
-      <g key={i}>
-        { month.map((d, j) => this.renderMoon(d, i, j - 1)) }
-      </g>
-    )
-  }
-
-  renderMoon(day, i, j) {
+  renderMoon(datum) {
     const { size } = this.state
+    const { month, day, phase } = datum
 
     return (
       <Moon
-        key={`${j}:${i}`}
-        day={day}
+        key={`${month}-${day}`}
         size={size}
-        x={MARGIN.left + i * size}
-        y={MARGIN.top + j * size}
+        x={MARGIN.left + (month - 1) * size}
+        y={MARGIN.top + (day - 1) * size}
+        phase={phase}
       />
     )
   }
 
   renderMonths() {
     const { size } = this.state
+    
     return range(12).map(m => 
       <text
         className="legend"
         key={m}
         x={MARGIN.left + (m + 0.5) * size}
         y={MARGIN.top / 2}
+        fontSize={size / 3}
       >
         { months[m] }
       </text>
@@ -92,6 +86,7 @@ class App extends Component {
         key={d}
         x={MARGIN.left / 2}
         y={MARGIN.top + (d + 0.5) * size}
+        fontSize={size / 3}
       >
         {d + 1}
       </text>
@@ -99,7 +94,7 @@ class App extends Component {
   }
 
   render() {
-    const { width, height, data, year } = this.state
+    const { width, height, year, data } = this.state
 
     return (
       <div ref={this.container}>
@@ -112,7 +107,7 @@ class App extends Component {
         <svg width={width} height={height}>
           { this.renderMonths() }
           { this.renderDays() }
-          { data.map(this.renderMoons) }
+          { data.map(this.renderMoon) }
         </svg>
       </div>
     );

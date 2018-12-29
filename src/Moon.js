@@ -1,39 +1,68 @@
 import React, { PureComponent } from 'react'
-import { getIllumination } from './illumination'
+import { arc } from 'd3'
+import { phases } from './phases'
+
+const WHITE = '#FFFFFF'
+const BLACK = '#010141'
 
 class Moon extends PureComponent {
 
+  getArc(r, start, end) {
+    return arc()
+      .outerRadius(r)
+      .innerRadius(0)
+      .startAngle(start)
+      .endAngle(end)()
+  }
+
   render() {
-    const { day, x, y, size } = this.props
-    const cx = x + (size / 2)
-    const cy = y + (size / 2)
+    const { x, y, size, phase } = this.props
+    const cx = size / 2
+    const cy = size / 2
     const r = size / 3
-    const illumination = getIllumination(day)
+    const { name, invert, scaleX, arcStart, arcEnd } = phases[phase]
+
+    if(name === 'New Moon') {
+      return (
+        <g className="moon" transform={`translate(${x},${y})`}>
+          <circle
+            className="background"
+            cx={cx}
+            cy={cy}
+            r={r}
+            stroke={WHITE}
+            fill="none"
+          />
+        </g>
+      )
+    }
 
     return (
-      <g className="moon">
+      <g className="moon" transform={`translate(${x},${y})`}>
         <circle
-          className="back"
+          className="background"
           cx={cx}
           cy={cy}
           r={r}
+          stroke={BLACK}
+          fill={invert ? BLACK : WHITE}
         />
         <circle
-          className="front"
-          cx={cx + 2 * r * illumination}
+          className="foreground"
+          cx={cx * 1.4}
           cy={cy}
           r={r}
+          fill={invert ? WHITE : BLACK}
+          transform={`scale(${scaleX}, 1)`}
         />
-        <text
-          x={cx}
-          y={cy}
-          fontSize={r / 1.5}
-        >
-          { (illumination * 100).toFixed(0) }%
-        </text>
+        <path
+          d={this.getArc(r, arcStart, arcEnd)}
+          fill={invert ? WHITE : BLACK}
+          transform={`translate(${cx},${cx})`}
+        />
       </g>
     )
   }
 }
 
-export default Moon;
+export default Moon
